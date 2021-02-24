@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CasClient {
     private CasCredentialProvider credentialProvider;
-    private boolean rememberMe = false; // TODO: remember-me was buggy so I disabled it for now
+    private boolean rememberMe = true; // TODO: remember-me was buggy so I disabled it for now
 
     public CasClient(CasCredentialProvider credentialProvider) {
         this.credentialProvider = credentialProvider;
@@ -23,11 +23,11 @@ public class CasClient {
 
             driver.findElementByName("submit").click();
 
-            // Now at Duo screen
-            // We must enter the Duo iframe!
-            driver.switchTo().frame("duo_iframe");
-
             if (rememberMe) {
+                // Now at Duo screen
+                // We must enter the Duo iframe!
+                driver.switchTo().frame("duo_iframe");
+
                 try {
                     try {
                         TimeUnit.SECONDS.sleep(2);
@@ -36,8 +36,8 @@ public class CasClient {
                     }
 
                     // Cancel automatic request if sent.
-                    WebElement cancelButton = driver.findElementByCssSelector(
-                            "#messages-view > .messages-list > div[data-id = '0'] > .message-content > button.btn-cancel");
+                    WebElement cancelButton = driver.findElementByCssSelector(//#messages-view > .messages-list > div[data-id = '0'] >
+                            ".message-content > button.btn-cancel");
                     cancelButton.click();
 
                     // Wait a sec to avoid "anomalous request"
