@@ -40,7 +40,7 @@ public class MoodleClient {
 
         String sessionKey = driver.findElementByName("sesskey").getAttribute("value");
 
-        Object scriptResult = driver.executeAsyncScript(BrowserDriverUtils.getScript("MoodleGetEvents.js"), sessionKey);
+        Object scriptResult = driver.executeAsyncScript(HelperUtils.getScript("MoodleGetEvents.js"), sessionKey);
 
         Gson gson = new Gson();
         Type responsesType = new TypeToken<List<MoodleApiResponse<MoodleEventsData>>>() {}.getType();
