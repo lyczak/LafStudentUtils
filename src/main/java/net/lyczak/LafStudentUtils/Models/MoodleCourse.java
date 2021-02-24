@@ -2,7 +2,7 @@ package net.lyczak.LafStudentUtils.Models;
 
 public class MoodleCourse {
     private String fullname;
-    private String shortnae;
+    private String shortname;
     private String summary;
     private long startdate;
     private long enddate;
@@ -19,12 +19,12 @@ public class MoodleCourse {
         this.fullname = fullname;
     }
 
-    public String getShortnae() {
-        return shortnae;
+    public String getShortname() {
+        return shortname;
     }
 
-    public void setShortnae(String shortnae) {
-        this.shortnae = shortnae;
+    public void setShortname(String shortname) {
+        this.shortname = shortname;
     }
 
     public String getSummary() {
