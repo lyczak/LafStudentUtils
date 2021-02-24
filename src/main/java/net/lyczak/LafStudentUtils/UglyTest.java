@@ -5,6 +5,7 @@ import net.lyczak.LafStudentUtils.Models.MoodleEvent;
 import org.openqa.selenium.Cookie;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,8 +42,13 @@ public class UglyTest {
             MoodleClient moodle = new MoodleClient(casClient);
             List<MoodleEvent> events = moodle.getEvents(driver);
 
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d h:mm a");
             log("\nMoodle Events: " + events.size());
-            events.forEach(e -> log(e.getName()));
+            events.forEach(e -> System.out.printf(
+                    "%s - %s (%s)%n",
+                    sdf.format(HelperUtils.fromMoodleDate(e.getTimestart())),
+                    e.getName(),
+                    e.getCourse().getShortname()));
 
             TransactClient transact = new TransactClient(casClient);
             Integer meals = transact.getWeekMealsRemaining(driver);
