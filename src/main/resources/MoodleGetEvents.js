@@ -11,7 +11,7 @@ var body = JSON.stringify([
         "args": {
             "limitnum": 6,
             "timesortfrom": dateNow,
-            "timesortto":   dateNow + 604800,
+            //"timesortto":   dateNow + 604800, // 60*60*24*7
             "limittononsuspendedevents": true
         }
     }
