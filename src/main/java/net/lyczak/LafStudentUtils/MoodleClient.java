@@ -12,6 +12,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class MoodleClient {
     private CasClient casClient;
@@ -34,11 +35,20 @@ public class MoodleClient {
                     .until(d -> d.getTitle().equals("Dashboard"));
         } catch (TimeoutException e) {
             // We're not on moodle dashboard
-            // TODO: throw exception or something
+            System.err.println(driver.getPageSource());
+            e.printStackTrace();
+            System.err.println("Timed out while waiting for Moodle.");
             return null;
         }
 
-        String sessionKey = driver.findElementByName("sesskey").getAttribute("value");
+        String sessionKey = "";
+        try {
+            sessionKey = driver.findElementByName("sesskey").getAttribute("value");
+        } catch (NoSuchElementException e) {
+            System.err.println(driver.getPageSource());
+            e.printStackTrace();
+            System.err.println("Failed to find Moodle sesskey.");
+        }
 
         Object scriptResult = driver.executeAsyncScript(HelperUtils.getScript("MoodleGetEvents.js"), sessionKey);
 
@@ -48,7 +58,8 @@ public class MoodleClient {
         MoodleApiResponse<MoodleEventsData> response = responses.get(0);
 
         if(response.isError()) {
-            // TODO: throw exception?
+            System.err.println((String) scriptResult);
+            System.err.println("Moodle API response returned error.");
             return null;
         } else {
             return response.getData().getEvents();
