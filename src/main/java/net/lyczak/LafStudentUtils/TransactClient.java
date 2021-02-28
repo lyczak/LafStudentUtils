@@ -47,15 +47,24 @@ public class TransactClient {
                     .ignoring(NoSuchElementException.class)
                     .until(d -> d.findElementById("MainContent_mprWeekValue") != null);
         } catch (TimeoutException e) {
-            // something timed out
-            // TODO: exception?
+            System.err.println(driver.getPageSource());
+            e.printStackTrace();
+            System.err.println("Timed out while waiting for Transact.");
+            return null;
+        } catch (NoSuchElementException e) {
+            System.err.println(driver.getPageSource());
+            e.printStackTrace();
+            System.err.println("Got NoSuchElement on Transact when exec script.");
             return null;
         }
 
         try {
             return Integer.parseInt(driver.findElementById("MainContent_mprWeekValue").getText());
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             // couldnt parse meal number
+            System.err.println(driver.getPageSource());
+            e.printStackTrace();
+            System.err.println("Failed to find/parse Transact meal number");
             return null;
         }
     }
