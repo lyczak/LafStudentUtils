@@ -38,7 +38,18 @@ public class TransactClient {
                     .until(d -> "eAccounts Account Summary".equals(d.getTitle()));
 
             // fake clicking the "Board Plan" button to load in ajax from the server
-            driver.executeScript("__doPostBack('ctl00$MainContent$BoardAccountContainer4','');");
+            // we need to do this multiple times bc the webforms js takes a while to load in
+            new FluentWait<>(driver)
+                    .withTimeout(Duration.ofSeconds(10))
+                    .pollingEvery(Duration.ofMillis(1000))
+                    .until(d -> {
+                        try {
+                            d.executeScript("__doPostBack('ctl00$MainContent$BoardAccountContainer4','');");
+                            return true;
+                        } catch (NoSuchElementException e) {
+                            return false;
+                        }
+                    });
 
             // wait for the meals-per-week section to appear
             new FluentWait<>(driver)
@@ -50,11 +61,6 @@ public class TransactClient {
             System.err.println(driver.getPageSource());
             e.printStackTrace();
             System.err.println("Timed out while waiting for Transact.");
-            return null;
-        } catch (NoSuchElementException e) {
-            System.err.println(driver.getPageSource());
-            e.printStackTrace();
-            System.err.println("Got NoSuchElement on Transact when exec script.");
             return null;
         }
 
