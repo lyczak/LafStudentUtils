@@ -1,20 +1,31 @@
 package net.lyczak.LafStudentUtils;
 
-import com.machinepublishers.jbrowserdriver.JBrowserDriver;
 import net.lyczak.LafStudentUtils.Models.MoodleEvent;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.*;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class UglyTest {
-    public static void main(String[] args) {
-        JBrowserDriver driver = new JBrowserDriver();
+    public static void main(String[] args) throws Exception {
+        URL driverUrl;
+        if(args.length > 1) {
+            driverUrl = new URL(args[1]);
+        } else {
+            driverUrl = new URL("http://localhost:4444/wd/hub");
+        }
 
-        if (args[0] != null) {
+        Capabilities capabilities = new DesiredCapabilities();
+        RemoteWebDriver driver = new RemoteWebDriver(driverUrl, capabilities);
+
+        if (args.length > 0) {
             Set<Cookie> cookies = loadCookies(args[0]);
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
@@ -40,7 +51,7 @@ public class UglyTest {
             CasClient casClient = new CasClient(credProv);
 
             MoodleClient moodle = new MoodleClient(casClient);
-            List<MoodleEvent> events = moodle.getEvents(driver);
+            List<MoodleEvent> events = moodle.getEvents(driver, driver);
 
             SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d h:mm a");
             log("\nMoodle Events: " + events.size());
@@ -51,7 +62,7 @@ public class UglyTest {
                     e.getCourse().getShortname()));
 
             TransactClient transact = new TransactClient(casClient);
-            Integer meals = transact.getWeekMealsRemaining(driver);
+            Integer meals = transact.getWeekMealsRemaining(driver, driver);
             log("\nMeals: " + meals);
         } finally {
             if (args[0] != null) {
