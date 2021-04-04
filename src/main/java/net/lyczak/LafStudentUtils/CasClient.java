@@ -1,10 +1,7 @@
 package net.lyczak.LafStudentUtils;
 
 import com.machinepublishers.jbrowserdriver.JBrowserDriver;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import java.time.Duration;
@@ -25,14 +22,14 @@ public class CasClient {
         this(credentialProvider, false);
     }
 
-    public void authenticate(JBrowserDriver driver) {
+    public void authenticate(WebDriver driver) {
         if (driver.getTitle().equals("Login - CAS – Central Authentication Service")) {
             // Now at Login screen
 
-            driver.findElementById("username").sendKeys(credentialProvider.getUsername());
-            driver.findElementById("password").sendKeys(credentialProvider.getPassword());
+            driver.findElement(By.id("username")).sendKeys(credentialProvider.getUsername());
+            driver.findElement(By.id("password")).sendKeys(credentialProvider.getPassword());
 
-            driver.findElementByName("submit").click();
+            driver.findElement(By.name("submit")).click();
 
             try {
                 new FluentWait<>(driver)
@@ -57,16 +54,17 @@ public class CasClient {
                             .withTimeout(Duration.ofSeconds(5))
                             .pollingEvery(Duration.ofMillis(100))
                             .ignoring(NoSuchElementException.class)
-                            .until(d -> d.findElementByCssSelector(
-                                    ".message-content > button.btn-cancel"));
+                            .until(d -> d.findElement(By.cssSelector(
+                                    ".message-content > button.btn-cancel")));
                 } catch (TimeoutException e) {
                     System.out.println("Timed out waiting for Duo cancel button."); // TODO: review this
                 }
 
                 try {
                     // Cancel automatic request if sent.
-                    WebElement cancelButton = driver.findElementByCssSelector(//#messages-view > .messages-list > div[data-id = '0'] >
-                            ".message-content > button.btn-cancel");
+                    WebElement cancelButton = driver.findElement(By.cssSelector(
+                            //#messages-view > .messages-list > div[data-id = '0'] >
+                            ".message-content > button.btn-cancel"));
                     cancelButton.click();
                 } catch (NoSuchElementException e) {
                     // TODO: error handling
@@ -75,8 +73,8 @@ public class CasClient {
 
                 try {
                     // Remember me
-                    WebElement rememberMeCheckbox = driver.findElementByXPath(
-                            "//*[@id='remember_me_label_text']/preceding-sibling::input[@type='checkbox']");
+                    WebElement rememberMeCheckbox = driver.findElement(By.xpath(
+                            "//*[@id='remember_me_label_text']/preceding-sibling::input[@type='checkbox']"));
                     if (!rememberMeCheckbox.isSelected()) {
                         rememberMeCheckbox.click();
                     }
@@ -91,10 +89,10 @@ public class CasClient {
                             .pollingEvery(Duration.ofMillis(2000))
                             .until(d -> {
                                 try {
-                                    d.findElementByCssSelector( // click "Send Me a Push"
-                                            "div.push-label > button.positive.auth-button").click();
+                                    d.findElement(By.cssSelector( // click "Send Me a Push"
+                                            "div.push-label > button.positive.auth-button")).click();
 
-                                    List<WebElement> messages = d.findElementById("messages-view")
+                                    List<WebElement> messages = d.findElement(By.id("messages-view"))
                                             .findElements(By.cssSelector("message.error"));
 
                                     messages.sort(Comparator.comparing(m -> m.getAttribute("data-id")));

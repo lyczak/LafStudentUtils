@@ -1,8 +1,7 @@
 package net.lyczak.LafStudentUtils;
 
 import com.machinepublishers.jbrowserdriver.JBrowserDriver;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import java.time.Duration;
@@ -17,6 +16,10 @@ public class TransactClient {
     }
 
     public Integer getWeekMealsRemaining(JBrowserDriver driver) {
+        return getWeekMealsRemaining(driver, driver);
+    }
+
+    public Integer getWeekMealsRemaining(WebDriver driver, JavascriptExecutor scriptExec) {
         driver.get("https://lafayette-sp.transactcampus.com/PARDaccounts/AccountSummary.aspx?menu=0");
 
         try {
@@ -44,7 +47,7 @@ public class TransactClient {
                     .pollingEvery(Duration.ofMillis(1000))
                     .until(d -> {
                         try {
-                            d.executeScript("__doPostBack('ctl00$MainContent$BoardAccountContainer4','');");
+                            scriptExec.executeScript("__doPostBack('ctl00$MainContent$BoardAccountContainer4','');");
                             return true;
                         } catch (NoSuchElementException e) {
                             return false;
@@ -56,7 +59,7 @@ public class TransactClient {
                     .withTimeout(Duration.ofSeconds(20))
                     .pollingEvery(Duration.ofMillis(1000))
                     .ignoring(NoSuchElementException.class)
-                    .until(d -> d.findElementById("MainContent_mprWeekValue") != null);
+                    .until(d -> d.findElement(By.id("MainContent_mprWeekValue")) != null);
         } catch (TimeoutException e) {
             System.err.println(driver.getPageSource());
             e.printStackTrace();
@@ -65,7 +68,7 @@ public class TransactClient {
         }
 
         try {
-            return Integer.parseInt(driver.findElementById("MainContent_mprWeekValue").getText());
+            return Integer.parseInt(driver.findElement(By.id("MainContent_mprWeekValue")).getText());
         } catch (Exception e) {
             // couldnt parse meal number
             System.err.println(driver.getPageSource());
