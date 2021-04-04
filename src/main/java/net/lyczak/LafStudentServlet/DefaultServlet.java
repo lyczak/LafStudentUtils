@@ -1,6 +1,5 @@
 package net.lyczak.LafStudentServlet;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -10,25 +9,11 @@ import java.io.PrintWriter;
 
 @WebServlet(value = "/")
 public class DefaultServlet extends HttpServlet {
-    private String message;
-
-    public void init() throws ServletException {
-        // Do required initialization
-        message = "Hello World";
-    }
-
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-
-        // Set response content type
-        response.setContentType("text/html");
-
-        // Actual logic goes here.
+        response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-        out.println("<h1>" + message + "</h1>");
-    }
 
-    public void destroy() {
-        // do nothing.
+        out.println("{\"message\":\"It works! LafStudentServlet is up and running!\"}");
     }
 }
