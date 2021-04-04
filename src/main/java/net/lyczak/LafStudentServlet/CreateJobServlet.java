@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import net.lyczak.LafStudentServlet.Jobs.Job;
-import net.lyczak.LafStudentServlet.Jobs.JobResult;
 import net.lyczak.LafStudentServlet.Jobs.JobType;
 import org.apache.http.HttpStatus;
 
@@ -43,12 +42,12 @@ public class CreateJobServlet extends HttpServlet {
             create = gson.fromJson(request.getReader(), CreateJobRequest.class);
         } catch (JsonIOException e) {
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-            out.println(gson.toJson(JobResult.error(
+            out.println(gson.toJson(Result.error(
                     "Failed to read request input")));
             return;
         } catch (JsonSyntaxException e) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            out.println(gson.toJson(JobResult.error(
+            out.println(gson.toJson(Result.error(
                     "Malformed request")));
             return;
         }
@@ -59,7 +58,7 @@ public class CreateJobServlet extends HttpServlet {
                 !session.getToken()
                         .equals(create.getSessionToken())) {
             response.setStatus(HttpStatus.SC_FORBIDDEN);
-            out.println(gson.toJson(JobResult.error(
+            out.println(gson.toJson(Result.error(
                     "No user session or invalid token")));
             return;
         }
@@ -69,7 +68,7 @@ public class CreateJobServlet extends HttpServlet {
             jobType = JobType.valueOf(create.jobType);
         } catch (IllegalArgumentException | NullPointerException e) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            out.println(gson.toJson(JobResult.error(
+            out.println(gson.toJson(Result.error(
                     "Bad jobType")));
             return;
         }
@@ -78,13 +77,14 @@ public class CreateJobServlet extends HttpServlet {
 
         if (job == null) {
             response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-            out.println(gson.toJson(JobResult.error(
+            out.println(gson.toJson(Result.error(
                     "Failed to add job")));
             return;
         }
 
         response.setStatus(HttpStatus.SC_CREATED);
-        out.println(JobResult.ok(job.getId()));
+        out.println(Result.ok(new CreateJobResponse(
+                job.getId(), job.isRepeating(), create.jobType)));
     }
 
     private class CreateJobRequest {
@@ -123,6 +123,42 @@ public class CreateJobServlet extends HttpServlet {
 
         public void setSessionToken(String sessionToken) {
             this.sessionToken = sessionToken;
+        }
+    }
+
+    private class CreateJobResponse {
+        private int id;
+        private String jobType;
+        private boolean repeating;
+
+        public CreateJobResponse(int id, boolean repeating, String jobType) {
+            this.id = id;
+            this.jobType = jobType;
+            this.repeating = repeating;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getJobType() {
+            return jobType;
+        }
+
+        public void setJobType(String jobType) {
+            this.jobType = jobType;
+        }
+
+        public boolean isRepeating() {
+            return repeating;
+        }
+
+        public void setRepeating(boolean repeating) {
+            this.repeating = repeating;
         }
     }
 

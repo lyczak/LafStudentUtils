@@ -1,5 +1,6 @@
 package net.lyczak.LafStudentServlet.Jobs;
 
+import net.lyczak.LafStudentServlet.Result;
 import net.lyczak.LafStudentUtils.LsuException;
 import net.lyczak.LafStudentUtils.Models.MoodleEvent;
 import net.lyczak.LafStudentUtils.MoodleClient;
@@ -22,14 +23,14 @@ public class MoodleEventsJob extends Job<List<MoodleEvent>, LsuException> {
             List<MoodleEvent> events = moodle.getEvents(driver, driver);
 
             if (events != null) {
-                result = JobResult.ok(events);
+                result = Result.ok(events);
             } else {
-                result = JobResult.error(new LsuException("Events list was null", driver.getPageSource()));
+                result = Result.error(new LsuException("Events list was null", driver.getPageSource()));
             }
         } catch (LsuException e) {
-            result = JobResult.error(e);
+            result = Result.error(e);
         } catch (Exception e) {
-            result = JobResult.error(new LsuException(e.getMessage(),
+            result = Result.error(new LsuException(e.getMessage(),
                     driver.getPageSource()).withDetail(Arrays.deepToString(e.getStackTrace())));
         }
     }

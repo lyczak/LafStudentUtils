@@ -1,5 +1,6 @@
 package net.lyczak.LafStudentServlet.Jobs;
 
+import net.lyczak.LafStudentServlet.Result;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 public abstract class Job<T, E> implements Runnable {
@@ -8,7 +9,7 @@ public abstract class Job<T, E> implements Runnable {
     protected RemoteWebDriver driver;
     protected boolean repeating;
     protected int id;
-    protected JobResult<T, E> result = JobResult.pending();
+    protected Result<T, E> result = Result.pending();
 
     public Job(RemoteWebDriver driver, boolean repeating) {
         this.driver = driver;
@@ -38,7 +39,7 @@ public abstract class Job<T, E> implements Runnable {
         return id;
     }
 
-    public JobResult<T, E> getResult() {
+    public Result<T, E> getResult() {
         return result;
     }
 }

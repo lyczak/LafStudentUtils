@@ -1,5 +1,6 @@
 package net.lyczak.LafStudentServlet.Jobs;
 
+import net.lyczak.LafStudentServlet.Result;
 import net.lyczak.LafStudentUtils.LsuException;
 import net.lyczak.LafStudentUtils.TransactClient;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -20,14 +21,14 @@ public class TransactMealsJob extends Job<Integer, LsuException> {
             Integer meals = transact.getWeekMealsRemaining(driver, driver);
 
             if (meals != null) {
-                result = JobResult.ok(meals);
+                result = Result.ok(meals);
             } else {
-                result = JobResult.error(new LsuException("Meal number was null", driver.getPageSource()));
+                result = Result.error(new LsuException("Meal number was null", driver.getPageSource()));
             }
         } catch (LsuException e) {
-            result = JobResult.error(e);
+            result = Result.error(e);
         } catch (Exception e) {
-            result = JobResult.error(new LsuException(e.getMessage(),
+            result = Result.error(new LsuException(e.getMessage(),
                     driver.getPageSource()).withDetail(Arrays.deepToString(e.getStackTrace())));
         }
     }
