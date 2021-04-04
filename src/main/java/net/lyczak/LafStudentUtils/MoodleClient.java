@@ -6,12 +6,16 @@ import com.machinepublishers.jbrowserdriver.JBrowserDriver;
 import net.lyczak.LafStudentUtils.Models.MoodleApiResponse;
 import net.lyczak.LafStudentUtils.Models.MoodleEvent;
 import net.lyczak.LafStudentUtils.Models.MoodleEventsData;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class MoodleClient {
     private CasClient casClient;
@@ -21,6 +25,10 @@ public class MoodleClient {
     }
 
     public List<MoodleEvent> getEvents(JBrowserDriver driver) {
+        return getEvents(driver, driver);
+    }
+
+    public List<MoodleEvent> getEvents(WebDriver driver, JavascriptExecutor scriptExec) {
         driver.get("https://cas.lafayette.edu/cas/login?service=https%3A%2F%2Fmoodle.lafayette.edu%2Flogin%2Findex.php");
 
         casClient.authenticate(driver);
@@ -34,13 +42,22 @@ public class MoodleClient {
                     .until(d -> d.getTitle().equals("Dashboard"));
         } catch (TimeoutException e) {
             // We're not on moodle dashboard
-            // TODO: throw exception or something
+            System.err.println(driver.getPageSource());
+            e.printStackTrace();
+            System.err.println("Timed out while waiting for Moodle.");
             return null;
         }
 
-        String sessionKey = driver.findElementByName("sesskey").getAttribute("value");
+        String sessionKey = "";
+        try {
+            sessionKey = driver.findElement(By.name("sesskey")).getAttribute("value");
+        } catch (NoSuchElementException e) {
+            System.err.println(driver.getPageSource());
+            e.printStackTrace();
+            System.err.println("Failed to find Moodle sesskey.");
+        }
 
-        Object scriptResult = driver.executeAsyncScript(HelperUtils.getScript("MoodleGetEvents.js"), sessionKey);
+        Object scriptResult = scriptExec.executeAsyncScript(HelperUtils.getScript("MoodleGetEvents.js"), sessionKey);
 
         Gson gson = new Gson();
         Type responsesType = new TypeToken<List<MoodleApiResponse<MoodleEventsData>>>() {}.getType();
@@ -48,7 +65,8 @@ public class MoodleClient {
         MoodleApiResponse<MoodleEventsData> response = responses.get(0);
 
         if(response.isError()) {
-            // TODO: throw exception?
+            System.err.println((String) scriptResult);
+            System.err.println("Moodle API response returned error.");
             return null;
         } else {
             return response.getData().getEvents();
