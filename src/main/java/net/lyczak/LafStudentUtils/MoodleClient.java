@@ -42,19 +42,14 @@ public class MoodleClient {
                     .until(d -> d.getTitle().equals("Dashboard"));
         } catch (TimeoutException e) {
             // We're not on moodle dashboard
-            System.err.println(driver.getPageSource());
-            e.printStackTrace();
-            System.err.println("Timed out while waiting for Moodle.");
-            return null;
+            throw new LsuException("Timed out while waiting for Moodle dashboard.", driver.getPageSource());
         }
 
         String sessionKey = "";
         try {
             sessionKey = driver.findElement(By.name("sesskey")).getAttribute("value");
         } catch (NoSuchElementException e) {
-            System.err.println(driver.getPageSource());
-            e.printStackTrace();
-            System.err.println("Failed to find Moodle sesskey.");
+            throw new LsuException("Failed to find Moodle sesskey on page.", driver.getPageSource());
         }
 
         Object scriptResult = scriptExec.executeAsyncScript(HelperUtils.getScript("MoodleGetEvents.js"), sessionKey);
@@ -65,9 +60,8 @@ public class MoodleClient {
         MoodleApiResponse<MoodleEventsData> response = responses.get(0);
 
         if(response.isError()) {
-            System.err.println((String) scriptResult);
-            System.err.println("Moodle API response returned error.");
-            return null;
+            throw new LsuException("Moodle API response returned error.", driver.getPageSource())
+                    .withDetail((String) scriptResult);
         } else {
             return response.getData().getEvents();
         }
