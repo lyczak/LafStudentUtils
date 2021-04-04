@@ -37,9 +37,7 @@ public class CasClient {
                         .pollingEvery(Duration.ofMillis(100))
                         .until(d -> "Duo Security Login - CAS – Central Authentication Service".equals(d.getTitle()));
             } catch (TimeoutException e) {
-                System.err.println(driver.getPageSource());
-                e.printStackTrace();
-                System.err.println("Timed out while waiting for CAS Duo.");
+                throw new LsuException("Timed out while waiting for Duo page-load", driver.getPageSource());
             }
 
             if (rememberMe) {
@@ -106,10 +104,7 @@ public class CasClient {
                                 }
                             });
                 } catch (TimeoutException e) {
-                    System.err.println(driver.getPageSource());
-                    e.printStackTrace();
-                    System.err.println("Timed out while waiting for first push.");
-                    return;
+                    throw new LsuException("Timed out waiting for first DUO push accept", driver.getPageSource());
                 }
 
                 driver.switchTo().defaultContent();
@@ -121,9 +116,7 @@ public class CasClient {
                             .until(d -> !"Duo Security Login - CAS – Central Authentication Service"
                                     .equals(d.getTitle()));
                 } catch (TimeoutException e) {
-                    System.err.println(driver.getPageSource());
-                    e.printStackTrace();
-                    System.err.println("Timed out while waiting for second push.");
+                    throw new LsuException("Timed out waiting for second DUO push accept", driver.getPageSource());
                 }
             }
         }

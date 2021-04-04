@@ -61,20 +61,16 @@ public class TransactClient {
                     .ignoring(NoSuchElementException.class)
                     .until(d -> d.findElement(By.id("MainContent_mprWeekValue")) != null);
         } catch (TimeoutException e) {
-            System.err.println(driver.getPageSource());
-            e.printStackTrace();
-            System.err.println("Timed out while waiting for Transact.");
-            return null;
+            throw new LsuException("Timed out waiting for transact meals postback load", driver.getPageSource());
         }
 
+        String mealNum = driver.findElement(By.id("MainContent_mprWeekValue")).getText();
         try {
-            return Integer.parseInt(driver.findElement(By.id("MainContent_mprWeekValue")).getText());
-        } catch (Exception e) {
+            return Integer.parseInt(mealNum);
+        } catch (NumberFormatException e) {
             // couldnt parse meal number
-            System.err.println(driver.getPageSource());
-            e.printStackTrace();
-            System.err.println("Failed to find/parse Transact meal number");
-            return null;
+            throw new LsuException("Failed to parse transact meal number", driver.getPageSource())
+                    .withDetail(mealNum);
         }
     }
 }
