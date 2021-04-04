@@ -11,8 +11,9 @@ import java.util.List;
 public class MoodleEventsJob extends Job<List<MoodleEvent>, LsuException> {
     private MoodleClient moodle;
 
-    public MoodleEventsJob(RemoteWebDriver driver, boolean repeating) {
+    public MoodleEventsJob(RemoteWebDriver driver, boolean repeating, MoodleClient moodle) {
         super(driver, repeating);
+        this.moodle = moodle;
     }
 
     @Override
