@@ -17,6 +17,14 @@ public class SessionManager {
         return instance;
     }
 
+    public void putSession(UserSession session) {
+        if (session == null) {
+            return;
+        }
+
+        sessions.put(session.getUserId(), session);
+    }
+
     public UserSession getSession(String userId) {
         return sessions.get(userId);
     }

@@ -14,7 +14,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 public class UserSession {
     private static final int TOKEN_LENGTH = 24;
 
-    private String userId;
+    private LssUser user;
     private String token;
     private UserJobSequence jobs = new UserJobSequence();
     private RemoteWebDriver webDriver;
@@ -24,8 +24,8 @@ public class UserSession {
     private MoodleClient moodleClient;
     private TransactClient transactClient;
 
-    public UserSession(String userId, RemoteWebDriver webDriver, CasCredentialProvider credProv) {
-        this.userId = userId;
+    public UserSession(LssUser user, RemoteWebDriver webDriver, CasCredentialProvider credProv) {
+        this.user = user;
         this.webDriver = webDriver;
         this.credProv = credProv;
 
@@ -76,7 +76,7 @@ public class UserSession {
     }
 
     public String getUserId() {
-        return userId;
+        return user.getUserId();
     }
 
     public String getToken() {
